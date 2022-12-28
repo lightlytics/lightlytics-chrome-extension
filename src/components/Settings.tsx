@@ -4,49 +4,49 @@ import {
   CircularProgress,
   FormControlLabel,
   Typography,
-} from "@mui/material";
-import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
-import { SyntheticEvent, useCallback, useState } from "react";
-import { createAccessToken, setAccessToken } from "../auth";
-import useSettings from "../hooks/useSettings";
-import { ISettings } from "../types";
+} from '@mui/material'
+import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import { SyntheticEvent, useCallback, useState } from 'react'
+import { createAccessToken, setAccessToken } from '../auth'
+import useSettings from '../hooks/useSettings'
+import { ISettings } from '../types'
 
 function Settings() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [settings, setSettings] = useSettings();
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [settings, setSettings] = useSettings()
 
   const inputProps = useCallback(
     (attr: keyof ISettings, isBoolean = false) => ({
-      [isBoolean ? "checked" : "value"]: settings?.[attr] || "",
+      [isBoolean ? 'checked' : 'value']: settings?.[attr] || '',
       onChange: (e: SyntheticEvent) => {
         setSettings({
           ...settings,
           [attr]: isBoolean
             ? !settings?.[attr]
             : ((e.target as any).value as string),
-        } as ISettings);
+        } as ISettings)
       },
     }),
-    [setSettings, settings]
-  );
+    [setSettings, settings],
+  )
 
   const handleLogin = useCallback(async () => {
-    setError(null);
-    setLoading(true);
+    setError(null)
+    setLoading(true)
     await createAccessToken()
-      .then((accessToken) => {
-        setAccessToken(accessToken);
+      .then(accessToken => {
+        setAccessToken(accessToken)
       })
-      .catch((err) => setError(err.message));
-    setLoading(false);
-  }, []);
+      .catch(err => setError(err.message))
+    setLoading(false)
+  }, [])
 
   return (
-    <Box sx={{ "& > :not(style)": { mb: 1, width: 350 } }}>
+    <Box sx={{ '& > :not(style)': { mb: 1, width: 350 } }}>
       <TextField
-        {...inputProps("hostname")}
+        {...inputProps('hostname')}
         size="small"
         variant="outlined"
         placeholder="Hostname"
@@ -54,7 +54,7 @@ function Settings() {
           endAdornment: (
             <FormControlLabel
               control={
-                <Checkbox {...inputProps("secured", true)} size="small" />
+                <Checkbox {...inputProps('secured', true)} size="small" />
               }
               label="Secured"
             />
@@ -62,14 +62,14 @@ function Settings() {
         }}
       />
       <TextField
-        {...inputProps("username")}
+        {...inputProps('username')}
         size="small"
         variant="outlined"
         placeholder="Username"
       />
       <TextField
-        {...inputProps("password")}
-        inputProps={{ type: "password" }}
+        {...inputProps('password')}
+        inputProps={{ type: 'password' }}
         size="small"
         variant="outlined"
         placeholder="Password"
@@ -88,7 +88,7 @@ function Settings() {
         )}
       </div>
     </Box>
-  );
+  )
 }
 
-export default Settings;
+export default Settings

@@ -1,9 +1,25 @@
-import React from "react";
+import {
+  useContext as useReactContext,
+  createContext,
+  SetStateAction,
+  Dispatch,
+} from 'react'
 
-const context = React.createContext<{}>({});
+const context = createContext<ContextProps>({})
+export const dispatcher = createContext<ContextDispatcher>(v => v)
 
-export function useContext() {
-  return React.useContext(context);
+export type ContextProps = {
+  headers?: any
 }
 
-export default context;
+export type ContextDispatcher = Dispatch<SetStateAction<ContextProps>>
+
+export function useContext() {
+  return useReactContext<ContextProps>(context)
+}
+
+export function useDispatcher() {
+  return useReactContext<ContextDispatcher>(dispatcher)
+}
+
+export default context

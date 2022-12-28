@@ -1,6 +1,6 @@
 export interface ISettings {
-  hostname: string;
-  secured: boolean;
-  username: string;
-  password: string;
+  hostname: string
+  secured: boolean
+  username: string
+  password: string
 }

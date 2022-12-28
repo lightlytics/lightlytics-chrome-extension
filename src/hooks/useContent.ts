@@ -1,9 +1,9 @@
-import React from "react";
-import { DOMMessage, DOMMessageResponse } from "../types";
+import React from 'react'
+import { DOMMessage, DOMMessageResponse } from '../types'
 
 function useContent() {
-  const [awsAccountId, setAWSAccouuntId] = React.useState<string | undefined>();
-  const [resourceIds, setResourceIds] = React.useState<string[]>([]);
+  const [awsAccountId, setAWSAccouuntId] = React.useState<string | undefined>()
+  const [resourceIds, setResourceIds] = React.useState<string[]>([])
 
   React.useEffect(() => {
     /**
@@ -16,25 +16,25 @@ function useContent() {
           active: true,
           currentWindow: true,
         },
-        (tabs) => {
-          setResourceIds([]);
-          setAWSAccouuntId("");
+        tabs => {
+          setResourceIds([])
+          setAWSAccouuntId('')
           chrome.tabs.sendMessage(
             tabs[0].id || 0,
-            { type: "GET_DOM" } as DOMMessage,
+            { type: 'GET_DOM' } as DOMMessage,
             (response: DOMMessageResponse) => {
-              setResourceIds(response.resourceIds);
-              setAWSAccouuntId(response.awsAccountId);
-            }
-          );
-        }
-      );
-  }, []);
+              setResourceIds(response.resourceIds)
+              setAWSAccouuntId(response.awsAccountId)
+            },
+          )
+        },
+      )
+  }, [])
 
   return {
     resourceIds,
     awsAccountId,
-  };
+  }
 }
 
-export default useContent;
+export default useContent

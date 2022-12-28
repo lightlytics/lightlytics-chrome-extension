@@ -1,3 +1,3 @@
 export type Workspace = {
-  customer_id: string;
-};
+  customer_id: string
+}
