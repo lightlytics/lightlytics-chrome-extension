@@ -1,18 +1,25 @@
-import { useApolloClient } from "@apollo/client";
-import { Box, CircularProgress, MenuItem, styled, TextField, Tooltip, Typography } from "@mui/material";
-import { useCallback, useRef, useState } from "react";
-import { useDispatcher } from "../context";
-import useAWSAccounts from "../hooks/useAWSAccounts";
-import useContent from "../hooks/useContent";
-import useSearch from "../hooks/useSearch";
-import ResourceDetails from "./ResourceDetails/ResourceDetails";
-
+import { useApolloClient } from '@apollo/client'
+import {
+  Box,
+  CircularProgress,
+  MenuItem,
+  styled,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import { useCallback, useRef, useState } from 'react'
+import { useDispatcher } from '../context'
+import useAWSAccounts from '../hooks/useAWSAccounts'
+import useContent from '../hooks/useContent'
+import useSearch from '../hooks/useSearch'
+import ResourceDetails from './ResourceDetails/ResourceDetails'
 
 function Search() {
   const dispatch = useDispatcher()
   const client = useApolloClient()
-  const { awsAccountId: contentAWSAccountId } = useContent();
-  const [awsAccountId, setAWSAccountId] = useState(contentAWSAccountId)
+  const { awsAccountId: contentAWSAccountId } = useContent()
+  const [awsAccountId, setAWSAccountId] = useState(contentAWSAccountId || '')
   const { awsAccounts, customerIdMap } = useAWSAccounts()
 
   const handleAWSAccountChange = async (newAWSAccountId: any) => {
@@ -23,68 +30,78 @@ function Search() {
       dispatch({
         headers: {
           customer,
-        }
+        },
       })
     }
   }
-  const [ phrase, setPhrase, rawPhrase] = useDebouncedState('')
+  const [phrase, setPhrase, rawPhrase] = useDebouncedState('')
   const { results, loading } = useSearch({ phrase })
   return (
-    <Box sx={{ "& > :not(style)": { mb: 1 } }}>
-       <TextField 
-        fullWidth 
+    <Box sx={{ '& > :not(style)': { mb: 1 } }}>
+      <TextField
+        fullWidth
         select
-        variant="outlined" 
-        value={awsAccountId} 
-        InputLabelProps={{shrink: true}} 
-        label="Account ID" 
+        variant="outlined"
+        value={awsAccountId || ''}
+        InputLabelProps={{ shrink: true }}
+        label="Account ID"
         disabled={!!contentAWSAccountId}
         SelectProps={{
-          displayEmpty: true
+          displayEmpty: true,
         }}
         onChange={ev => handleAWSAccountChange(ev.target.value)}
       >
-        <MenuItem>
+        <MenuItem value={''}>
           <Typography color="textSecondary">Select AWS Account</Typography>
         </MenuItem>
-        {awsAccounts?.map((w: any, i: number) => <MenuItem value={w.aws_account_id} key={i}>
-          <Typography>{w.aws_account_id} - {w.display_name}</Typography>
-        </MenuItem>)}
-        </TextField>
+        {awsAccounts?.map((w: any, i: number) => (
+          <MenuItem value={w.aws_account_id} key={i}>
+            <Typography>
+              {w.aws_account_id} - {w.display_name}
+            </Typography>
+          </MenuItem>
+        ))}
+      </TextField>
 
-
-      <TextField 
-        fullWidth 
-        variant="outlined" 
-        value={rawPhrase} 
+      <TextField
+        fullWidth
+        variant="outlined"
+        value={rawPhrase}
         disabled={!awsAccountId && !contentAWSAccountId}
-        onChange={ev => setPhrase(ev.target.value)} placeholder="Search by name, ID, tags or IP" 
+        onChange={ev => setPhrase(ev.target.value)}
+        placeholder="Search by name, ID, tags or IP"
         InputProps={{
-          endAdornment: loading && <CircularProgress size={15} />
+          endAdornment: loading && <CircularProgress size={15} />,
         }}
       />
       {results?.map((result: any) => (
-      <Tooltip placement="right" title={<ResourceDetails resourceId={result.resource_id} />}>
-      <SearchReult>
-        <Typography>{result.resource_type}</Typography>
-        <Typography>{result.resource_id}</Typography>
-        <Typography>{result.display_name}</Typography>
-      </SearchReult></Tooltip>))}
+        <Tooltip
+          key={result.resource_id}
+          placement="right"
+          title={<ResourceDetails resourceId={result.resource_id} />}
+        >
+          <SearchReult>
+            <Typography>{result.resource_type}</Typography>
+            <Typography>{result.resource_id}</Typography>
+            <Typography>{result.display_name}</Typography>
+          </SearchReult>
+        </Tooltip>
+      ))}
     </Box>
-  );
+  )
 }
 
-const SearchReult = styled('div')(( { theme }) => ({
+const SearchReult = styled('div')(({ theme }) => ({
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
-  }
+  },
 }))
 
 function useDebouncedState(defaultValue: any) {
   const ref = useRef<any>()
-  const [ rawValue, setRawValue] = useState(defaultValue)
-  const [ value, setValue] = useState(defaultValue)
-  const update = useCallback((v) => {
+  const [rawValue, setRawValue] = useState(defaultValue)
+  const [value, setValue] = useState(defaultValue)
+  const update = useCallback(v => {
     setRawValue(v)
     clearTimeout(ref.current)
     ref.current = setTimeout(() => {
@@ -94,4 +111,4 @@ function useDebouncedState(defaultValue: any) {
   return [value, update, rawValue]
 }
 
-export default Search;
+export default Search

@@ -1,6 +1,6 @@
 {
-  "name": "chrome-react-seo-extension",
-  "version": "0.1.0",
+  "name": "lightlytics-assistant",
+  "version": "0.1.2",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.6.5",

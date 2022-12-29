@@ -19,7 +19,9 @@ function Settings() {
 
   const inputProps = useCallback(
     (attr: keyof ISettings, isBoolean = false) => ({
-      [isBoolean ? 'checked' : 'value']: settings?.[attr] || '',
+      [isBoolean ? 'checked' : 'value']: isBoolean
+        ? !!settings?.[attr]
+        : settings?.[attr] || '',
       onChange: (e: SyntheticEvent) => {
         setSettings({
           ...settings,

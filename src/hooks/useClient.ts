@@ -78,7 +78,7 @@ export function getErrorLink(ref: any) {
             .finally(() => {
               ref.current.working = false
             }),
-        ).filter(value => Boolean(value))
+        )
       } else {
         forward$ = fromPromise(
           new Promise(resolve => {

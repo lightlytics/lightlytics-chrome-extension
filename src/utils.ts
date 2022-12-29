@@ -1,6 +1,7 @@
 export function getStorageData<Type>(key: string): Promise<Type> {
   if (typeof chrome.storage === 'undefined') {
-    return Promise.resolve(JSON.parse(localStorage.getItem(key) || '{}'))
+    const item = localStorage.getItem(key)
+    return Promise.resolve(typeof item === 'string' ? JSON.parse(item) : item)
   } else {
     return new Promise(resolve => {
       chrome.storage.sync.get(key, result => {

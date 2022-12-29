@@ -44,7 +44,6 @@ export async function createAccessToken() {
       },
     })
     .then(({ data }) => {
-      console.log(data)
       return data?.login?.access_token
     })
 }
