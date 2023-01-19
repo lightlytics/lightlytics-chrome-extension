@@ -9,11 +9,17 @@ import {
 import { GraphQLErrors } from '@apollo/client/errors'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
-import { LIGHTLYTICS_HOST_URL } from './config'
+import {
+  CLIENT_OPTIONS_STORAGE_KEY,
+  LIGHTLYTICS_DEFAULT_HOST,
+  SESSION_STORAGE_KEY,
+} from './config'
+import { getStorageValue } from './storage'
 
 type RefreshHandler = (newAccessToken: string) => void
 
 export type ClientOptions = {
+  host?: string
   customer?: string
   session?: Session
   onRefresh?: RefreshHandler
@@ -30,11 +36,21 @@ export type User = {
   full_name: string
 }
 
+export async function getClient() {
+  const clientOptions = await getStorageValue(CLIENT_OPTIONS_STORAGE_KEY)
+  const session = await getStorageValue(SESSION_STORAGE_KEY)
+
+  return createClient({
+    ...clientOptions,
+    session,
+  })
+}
+
 export function createClient(
   options: ClientOptions = {},
 ): ApolloClient<NormalizedCacheObject> {
-  const httpLink = getHttpLink()
-  const { session } = options
+  const { host, session } = options
+  const httpLink = getHttpLink(host)
 
   const authContext = {
     accessToken: options.session?.access_token,
@@ -141,9 +157,9 @@ export async function refreshSession(refreshToken: string) {
   return response.data?.refresh?.access_token
 }
 
-export function getHttpLink() {
+export function getHttpLink(host?: string) {
   return createHttpLink({
-    uri: `${LIGHTLYTICS_HOST_URL}/graphql`,
+    uri: `https://${host || LIGHTLYTICS_DEFAULT_HOST}/graphql`,
   })
 }
 

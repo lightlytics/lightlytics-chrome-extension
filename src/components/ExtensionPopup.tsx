@@ -5,6 +5,7 @@ import LogoutButton from './LogoutButton'
 import UserDetails from './UserDetails'
 
 import image from '../assets/lightlytics.png'
+import HostInput from './HostInput'
 
 function ExtensionPopup() {
   const [session] = useSession()
@@ -15,11 +16,15 @@ function ExtensionPopup() {
       <Frontdrop>
         {session ? (
           <>
+            <HostInput variant="standard" size="small" disabled />
             <UserDetails />
             <LogoutButton />
           </>
         ) : (
-          <LoginButton />
+          <>
+            <HostInput />
+            <LoginButton />
+          </>
         )}
       </Frontdrop>
     </Container>

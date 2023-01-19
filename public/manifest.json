@@ -32,7 +32,8 @@
     },
     {
       "matches": [
-        "https://app.lightlytics.com/*"
+        "https://*.lightlytics.com/*",
+        "https://*.lightops.io/*"
       ],
       "js": [
         "./static/js/lightlytics_cs.js"

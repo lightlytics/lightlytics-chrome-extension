@@ -11,7 +11,9 @@ function useStorage<T>(key: string, defaultValue?: T) {
 
   useEffect(() => {
     getStorageValue(key).then(value => {
-      setValue(value as T)
+      if (typeof value !== 'undefined') {
+        setValue(value as T)
+      }
     })
   }, [key])
 

@@ -8,10 +8,8 @@ import tippy from 'tippy.js'
 import { ContextProvider } from '../context'
 import ResourceDetails from '../components/ResourceDetails'
 import { getCustomerByAccount } from './shared'
-import { createClient, ClientOptions } from '../client'
+import { createClient, ClientOptions, getClient } from '../client'
 import { NoAccountFoundMessage } from './NoAccountFoundMessage'
-import { getStorageValue, setStorageValue } from '../storage'
-import { SESSION_STORAGE_KEY } from '../config'
 
 const AWS_ID_REGEXP = new RegExp('[\\w]*-[\\w]{17}')
 
@@ -68,24 +66,11 @@ function stop() {
   targetOut()
 }
 
-let client: ReturnType<typeof createClient> | undefined
+let singletonClient: ReturnType<typeof createClient> | undefined
 
-const getClient = async () => {
-  if (client) return client
-  const session = await getStorageValue(SESSION_STORAGE_KEY)
-  if (!session) {
-    throw new Error('authentication required')
-  }
-
-  return (client = createClient({
-    session,
-    onRefresh(newAccessToken: string) {
-      return setStorageValue(SESSION_STORAGE_KEY, {
-        ...session,
-        access_token: newAccessToken,
-      })
-    },
-  }))
+const getSingletonClient = async () => {
+  if (singletonClient) return singletonClient
+  return (singletonClient = await getClient())
 }
 
 let activeTarget: HTMLElement | null
@@ -101,7 +86,7 @@ async function targetIn() {
 
   const awsResponse = (window.top || window).getAWSResponse?.()
 
-  const client = await getClient()
+  const client = await getSingletonClient()
 
   if (awsResponse?.awsAccountId) {
     clientOptions.customer = await getCustomerByAccount({

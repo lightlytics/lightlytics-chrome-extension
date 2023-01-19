@@ -1,8 +1,10 @@
 import { useCallback, useMemo } from 'react'
 import { createClient, ClientOptions } from '../client'
+import useClientOptions from './useClientOptions'
 import useSession from './useSession'
 
 function useClient(options: ClientOptions | undefined) {
+  const [clientOptions] = useClientOptions()
   const [session, updateSession] = useSession()
 
   const onRefresh = useCallback(
@@ -20,8 +22,8 @@ function useClient(options: ClientOptions | undefined) {
   )
 
   return useMemo(
-    () => createClient({ ...options, session, onRefresh }),
-    [onRefresh, options, session],
+    () => createClient({ ...clientOptions, ...options, session, onRefresh }),
+    [onRefresh, options, session, clientOptions],
   )
 }
 
