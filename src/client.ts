@@ -68,7 +68,9 @@ export function createClient(
   }
 
   if (session?.refresh_token) {
-    link = getErrorLink(session.refresh_token, handleRefresh).concat(link)
+    link = getErrorLink(session.refresh_token, handleRefresh, options).concat(
+      link,
+    )
   }
 
   return new ApolloClient({
@@ -96,7 +98,11 @@ export function getAuthLink(authContext: AuthContext) {
   })
 }
 
-export function getErrorLink(refreshToken: string, onRefresh?: RefreshHandler) {
+export function getErrorLink(
+  refreshToken: string,
+  onRefresh?: RefreshHandler,
+  options?: ClientOptions,
+) {
   const ref = {
     current: {
       working: false,
@@ -111,7 +117,7 @@ export function getErrorLink(refreshToken: string, onRefresh?: RefreshHandler) {
         ref.current.working = true
 
         forward$ = fromPromise(
-          refreshSession(refreshToken)
+          refreshSession(refreshToken, options)
             .then((newAccessToken: string) => {
               onRefresh?.(newAccessToken)
               ref.current.resolvers.forEach((resolve: any) => resolve())
@@ -138,8 +144,13 @@ export function getErrorLink(refreshToken: string, onRefresh?: RefreshHandler) {
   })
 }
 
-export async function refreshSession(refreshToken: string) {
-  const client = createClient()
+export async function refreshSession(
+  refreshToken: string,
+  options?: ClientOptions,
+) {
+  const client = createClient({
+    host: options?.host,
+  })
 
   const response = await client.mutate({
     mutation: gql`

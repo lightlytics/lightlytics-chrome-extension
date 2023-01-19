@@ -113,6 +113,7 @@ async function targetIn() {
     interactive: true,
     appendTo: () => document.body,
     onHide() {
+      ReactDOM.unmountComponentAtNode(content)
       resetTarget(activeTarget)
       hideIndicator()
       activeTarget = null
