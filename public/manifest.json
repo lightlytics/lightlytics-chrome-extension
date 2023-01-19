@@ -13,10 +13,10 @@
         "https://*.aws.amazon.com/*"
       ],
       "js": [
-        "./static/js/tooltips.js"
+        "./static/js/tooltips_cs.js"
       ],
       "css": [
-        "./static/css/tooltips.css"
+        "./static/css/tooltips_cs.css"
       ],
       "match_about_blank": true,
       "match_origin_as_fallback": true,
@@ -27,7 +27,15 @@
         "https://*.aws.amazon.com/*"
       ],
       "js": [
-        "./static/js/content.js"
+        "./static/js/aws_cs.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://app.lightlytics.com/*"
+      ],
+      "js": [
+        "./static/js/lightlytics_cs.js"
       ]
     }
   ],

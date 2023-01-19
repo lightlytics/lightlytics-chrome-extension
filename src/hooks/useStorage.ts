@@ -1,58 +1,36 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
+import {
+  addStorageListener,
+  clearStorageValue,
+  getStorageValue,
+  setStorageValue,
+} from '../storage'
 
-function useStorage<Type>(
-  key: string,
-  defaultValue?: Type,
-): [Type | undefined, (newValue: any) => void, { loading: Boolean }] {
-  const [loading, setLoading] = useState(false)
-  const [value, setValue] = useState<Type | undefined>()
+function useStorage<T>(key: string, defaultValue?: T) {
+  const [value, setValue] = useState<T | undefined>(defaultValue)
+
   useEffect(() => {
-    setLoading(true)
-    if (typeof chrome.storage === 'undefined') {
-      setValue({
-        ...defaultValue,
-        ...JSON.parse(localStorage.getItem(key) || '{}'),
-      })
-    } else {
-      chrome.storage.sync.get([key], function (result) {
-        setValue({ ...defaultValue, ...result[key] })
-        setLoading(false)
-      })
-    }
-  }, [defaultValue, key])
+    getStorageValue(key).then(value => {
+      setValue(value as T)
+    })
+  }, [key])
 
-  const handleChanges = useCallback(
-    changes => {
-      if (changes[key]) {
-        setValue(changes[key].newValue)
-      }
+  useEffect(() => {
+    return addStorageListener(key, setValue)
+  }, [key])
+
+  const setter = useCallback(
+    (newValue, { merge } = { merge: false }) => {
+      return setStorageValue(key, merge ? { ...value, ...newValue } : newValue)
     },
-    [key],
+    [key, value],
   )
 
-  useEffect(() => {
-    if (typeof chrome.storage === 'undefined') {
-    } else {
-      chrome.storage.onChanged.addListener(handleChanges)
-      return () => chrome.storage.onChanged.removeListener(handleChanges)
-    }
-  }, [handleChanges])
+  const remover = useCallback(() => {
+    return clearStorageValue(key)
+  }, [key])
 
-  return [
-    value,
-    useCallback(
-      (newValue: Type) => {
-        if (typeof chrome.storage === 'undefined') {
-          setValue(newValue)
-          localStorage.setItem(key, JSON.stringify(newValue))
-        } else {
-          chrome.storage.sync.set({ [key]: newValue })
-        }
-      },
-      [key],
-    ),
-    { loading },
-  ]
+  return [value, setter, remover] as const
 }
 
 export default useStorage

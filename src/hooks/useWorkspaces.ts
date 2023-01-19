@@ -1,7 +1,8 @@
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
+import { WORKSPACES_QUERY } from '../queries'
 
 function useWorkspaces() {
-  const { data, loading, error } = useQuery(QUERY, {
+  const { data, loading, error } = useQuery(WORKSPACES_QUERY, {
     context: {
       headers: {
         customer: false,
@@ -15,22 +16,5 @@ function useWorkspaces() {
     error,
   }
 }
-
-export async function getWorkspaces(client: any) {
-  const data = await client.query({
-    query: QUERY,
-  })
-
-  return data?.data.workspaces
-}
-
-const QUERY = gql`
-  query Workspaces {
-    workspaces {
-      customer_id
-      customer_name
-    }
-  }
-`
 
 export default useWorkspaces

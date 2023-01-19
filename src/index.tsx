@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
-import Popup from './components/Popup'
-import ContextProvider from './components/ContextProvider'
+import { ContextProvider } from './context'
+import ExtensionPopup from './components/ExtensionPopup'
 
 ReactDOM.render(
   <React.StrictMode>
     <ContextProvider>
-      <Popup />
+      <ExtensionPopup />
     </ContextProvider>
   </React.StrictMode>,
   document.getElementById('root'),
