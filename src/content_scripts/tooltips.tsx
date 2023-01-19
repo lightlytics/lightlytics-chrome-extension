@@ -68,9 +68,12 @@ function stop() {
 
 let singletonClient: ReturnType<typeof createClient> | undefined
 
-const getSingletonClient = async () => {
-  if (singletonClient) return singletonClient
-  return (singletonClient = await getClient())
+const getSingletonClient = async (
+  options?: ClientOptions,
+  override?: boolean,
+) => {
+  if (!override && singletonClient) return singletonClient
+  return (singletonClient = await getClient(options))
 }
 
 let activeTarget: HTMLElement | null
@@ -82,23 +85,25 @@ async function targetIn() {
 
   const content = document.createElement('div')
 
-  const clientOptions: ClientOptions = {}
-
   const awsResponse = (window.top || window).getAWSResponse?.()
 
-  const client = await getSingletonClient()
+  let customer,
+    client = await getSingletonClient()
 
   if (awsResponse?.awsAccountId) {
-    clientOptions.customer = await getCustomerByAccount({
+    customer = await getCustomerByAccount({
       client,
       aws_account_id: awsResponse.awsAccountId,
     })
+    if (customer) {
+      client = await getSingletonClient({ customer }, true)
+    }
   }
 
   ReactDOM.render(
     <React.StrictMode>
-      <ContextProvider clientOptions={clientOptions}>
-        {clientOptions.customer ? (
+      <ContextProvider client={client}>
+        {customer ? (
           <ResourceDetails resourceId={id} />
         ) : (
           <NoAccountFoundMessage awsAccountId={awsResponse?.awsAccountId} />

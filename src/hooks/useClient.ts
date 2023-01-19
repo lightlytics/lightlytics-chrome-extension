@@ -1,30 +1,8 @@
-import { useCallback, useMemo } from 'react'
-import { createClient, ClientOptions } from '../client'
-import useClientOptions from './useClientOptions'
-import useSession from './useSession'
+import { useMemo } from 'react'
+import { ClientOptions, createClient } from '../client'
 
 function useClient(options: ClientOptions | undefined) {
-  const [clientOptions] = useClientOptions()
-  const [session, updateSession] = useSession()
-
-  const onRefresh = useCallback(
-    (newAccessToken: string) => {
-      updateSession(
-        {
-          access_token: newAccessToken,
-        },
-        {
-          merge: true,
-        },
-      )
-    },
-    [updateSession],
-  )
-
-  return useMemo(
-    () => createClient({ ...clientOptions, ...options, session, onRefresh }),
-    [onRefresh, options, session, clientOptions],
-  )
+  return useMemo(() => createClient(options), [options])
 }
 
 export default useClient

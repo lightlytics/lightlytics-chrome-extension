@@ -14,7 +14,7 @@ import {
   LIGHTLYTICS_DEFAULT_HOST,
   SESSION_STORAGE_KEY,
 } from './config'
-import { getStorageValue } from './storage'
+import { getStorageValue, setStorageValue } from './storage'
 
 type RefreshHandler = (newAccessToken: string) => void
 
@@ -36,19 +36,31 @@ export type User = {
   full_name: string
 }
 
-export async function getClient() {
+export async function getClientOptions() {
   const clientOptions = await getStorageValue(CLIENT_OPTIONS_STORAGE_KEY)
   const session = await getStorageValue(SESSION_STORAGE_KEY)
 
-  return createClient({
+  return {
     ...clientOptions,
     session,
-  })
+    onRefresh(newAccessToken: string) {
+      setStorageValue(SESSION_STORAGE_KEY, {
+        ...session,
+        access_token: newAccessToken,
+      })
+    },
+  }
 }
 
-export function createClient(
-  options: ClientOptions = {},
-): ApolloClient<NormalizedCacheObject> {
+export async function getClient(defaultOptions?: ClientOptions) {
+  const options = await getClientOptions()
+
+  return createClient({ ...defaultOptions, ...options })
+}
+
+export type Client = ApolloClient<NormalizedCacheObject>
+
+export function createClient(options: ClientOptions = {}): Client {
   const { host, session } = options
   const httpLink = getHttpLink(host)
 

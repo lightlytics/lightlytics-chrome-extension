@@ -1,14 +1,13 @@
-import React, {
-  useContext as useReactContext,
-  createContext,
-  SetStateAction,
-  Dispatch,
-  useState,
-} from 'react'
 import { ApolloProvider } from '@apollo/client'
 import { createTheme, ThemeProvider } from '@mui/material'
-import useClient from './hooks/useClient'
-import { ClientOptions } from './client'
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext as useReactContext,
+  useState,
+} from 'react'
+import { Client } from './client'
 
 const context = createContext<ContextProps>({})
 export const dispatcher = createContext<ContextDispatcher>(v => v)
@@ -28,10 +27,9 @@ export function useDispatcher() {
 const theme = createTheme()
 
 export const ContextProvider: React.FC<{
-  clientOptions?: ClientOptions
-}> = ({ clientOptions, children }) => {
+  client: Client
+}> = ({ client, children }) => {
   const [value, setValue] = useState<ContextProps>({})
-  const client = useClient(clientOptions)
 
   return (
     <context.Provider value={value}>
